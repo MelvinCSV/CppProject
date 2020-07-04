@@ -2,19 +2,24 @@
 #include <math.h>
 #include "X_simulation.h"
 
+//In this file, we implement the Broadie Kaya scheme for the simulation of the logarithm of the next spot
+// ln X(t+delta) is Gaussian and we are computing its moments in order to simulate a vector of spots
 
+//Computing the expectation of the next X
 double expectation_X_next(double X, double V, double V_next, double delta, Heston_Model h)
 {
        double integral_V = delta * (V + V_next) /2;
        return log(X) + (h.rho / h.sigma) * (V_next - V - h.kappa * h.theta * delta) + (h.kappa * h.rho / h.sigma - 0.5) * integral_V;
 }
 
+//Computing the variance of the next X
 double variance_X_next(double V, double V_next, double delta, Heston_Model h)
 {
     double integral_V = delta * (V + V_next) / 2;
     return (1 - h.rho * h.rho) * integral_V;
 }
 
+//Drawing X_next from a gaussian distribution with previously computed expectation and variance
 double X_next_simulate(double X, double V, double V_next, double delta, Heston_Model h)
 {
     double expectation = expectation_X_next(X, V, V_next, delta, h);
@@ -28,6 +33,7 @@ X_simulator::X_simulator(int N, double T, double x0, Simulator* Var_Simulator, H
 {
 }
 
+//Simulating a vector of spots
 RandomProcess X_simulator::simulate() const
 {   
     double x = x0;
